@@ -1,6 +1,6 @@
 [project]
 name = "ValLib"
-version = "1.0.0"
+version = "1.0.1"
 readme = "README.md"
 authors = [{ name = "PWall" }]
 license = {text = "GPL-3.0"}
