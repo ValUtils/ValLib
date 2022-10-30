@@ -8,6 +8,16 @@ from hachoir.stream import FileInputStream
 
 from .storage import read_from_drive, save_to_drive, settingsPath
 
+def val_api_version():
+	r = requests.get('https://valorant-api.com/v1/version')
+	data = r.json()['data']
+	val, riot = "", ""
+	if ("riotClientVersion" in data):
+		val = data["riotClientVersion"]
+	if ("riotClientBuild" in data):
+		riot = data["riotClientBuild"]
+	return val, riot
+
 def get_exe_version(path:Path):
 	realPath = str(path)
 	stream = FileInputStream(realPath)
@@ -17,8 +27,14 @@ def get_exe_version(path:Path):
 	stream.close()
 	return version
 
+def val_version():
+	get_versions()
+	return versions["valorant"]
+
 def riot_version():
-	version = ""
+	get_versions()
+	if (versions["riot"]):
+		return versions["riot"]
 	if (system() == "Windows"):
 		version = from_exe()
 	if (not version):
@@ -58,3 +74,13 @@ def get_save_remote(versionPath):
 
 def real_version(version):
 	return f"{version}.{version.split('.')[-1]}"
+
+def get_versions():
+	global versions
+	if ("versions" in globals()):
+		return
+	val, riot = val_api_version()
+	versions = {
+		"valorant": val,
+		"riot": riot
+	}
