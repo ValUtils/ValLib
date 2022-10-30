@@ -1,0 +1,16 @@
+[project]
+name = "ValLib"
+version = "1.0.0"
+readme = "README.md"
+authors = [{ name = "PWall" }]
+license = {text = "GPL-3.0"}
+keywords = ["valorant", "api", "auth"]
+dependencies = [
+    "requests",
+    "jwt",
+    "hachoir",
+]
+requires-python = ">=3.8"
+
+[project.urls]
+Homepage = "https://github.com/ValUtils/ValLib"
