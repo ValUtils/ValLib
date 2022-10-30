@@ -1,3 +1,4 @@
+from os import getenv
 import requests
 from time import time
 from pathlib import Path
@@ -6,7 +7,7 @@ from hachoir.parser import guessParser
 from hachoir.metadata import extractMetadata
 from hachoir.stream import FileInputStream
 
-from .storage import read_from_drive, save_to_drive, settingsPath
+from .storage import json_read, read_from_drive, save_to_drive, settingsPath
 
 def val_api_version():
 	r = requests.get('https://valorant-api.com/v1/version')
@@ -52,7 +53,12 @@ def fallback():
 	return read_from_drive(versionPath)
 
 def from_exe():
-	defaultLocation = Path("C:/Riot Games/Riot Client/RiotClientServices.exe")
+	programData = Path(getenv("ProgramData"))
+	riotInstallsPath = programData / "Riot Games" / "RiotClientInstalls.json"
+	if (not riotInstallsPath.exists()):
+		return
+	riotInstalls = json_read(riotInstallsPath)
+	defaultLocation = Path(riotInstalls["rc_default"])
 	if (not defaultLocation.exists()):
 		return
 	version = get_exe_version(defaultLocation)
