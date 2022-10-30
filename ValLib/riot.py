@@ -7,7 +7,7 @@ from requests.adapters import HTTPAdapter
 from .exceptions import AuthException
 from .structs import Auth, User
 from .parsing import encode_json, magic_decode
-from .get_version import riot_version
+from .get_version import riot_version, val_version
 
 platform = {
 	"platformType": "PC",
@@ -117,11 +117,6 @@ def get_user_info(session: requests.Session, access_token):
 	data = post(session, access_token, "https://auth.riotgames.com/userinfo")
 	return data['sub']
 
-def get_version():
-	r = requests.get('https://valorant-api.com/v1/version')
-	data = r.json()['data']
-	return data["riotClientVersion"]
-
 def make_headers(auth: Auth):
 	return {
 		'Accept-Encoding': 'gzip, deflate, br',
@@ -129,5 +124,5 @@ def make_headers(auth: Auth):
 		'Authorization': f'Bearer {auth.access_token}',
 		'X-Riot-Entitlements-JWT': auth.entitlements_token,
 		'X-Riot-ClientPlatform': encode_json(platform),
-		'X-Riot-ClientVersion': get_version()
+		'X-Riot-ClientVersion': val_version()
 	}
