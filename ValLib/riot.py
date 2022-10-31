@@ -7,7 +7,7 @@ from requests.adapters import HTTPAdapter
 from .exceptions import AuthException
 from .structs import Auth, User
 from .parsing import encode_json, magic_decode
-from .get_version import riot_version, val_version
+from .version import riot_version, val_version
 
 platform = {
 	"platformType": "PC",
