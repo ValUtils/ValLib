@@ -50,11 +50,3 @@ def utils_path():
 		utilsPath = linux_path()
 		create_path(utilsPath)
 	return utilsPath
-
-def set_path():
-	global settingsPath
-	utilsPath = utils_path()
-	settingsPath = utilsPath / "lib"
-	create_path(settingsPath)
-
-set_path()
