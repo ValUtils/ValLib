@@ -6,7 +6,6 @@ on:
       - "main"
     paths:
       - "**/*.py"
-      - "pyproject.toml"
   workflow_dispatch:
   schedule:
     - cron: 0 0 * * 1
