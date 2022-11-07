@@ -44,9 +44,11 @@ def utils_path():
 	global utilsPath
 	if (platform.system() == "Windows"):
 		appdata = Path(getenv('APPDATA'))
-		utilsPath = appdata / "ValUtils"
+		utilsPath = appdata.resolve() / "ValUtils"
 		create_path(utilsPath)
 	elif (platform.system() == "Linux"):
 		utilsPath = linux_path()
 		create_path(utilsPath)
 	return utilsPath
+
+utils_path()
