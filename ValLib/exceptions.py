@@ -1,5 +1,6 @@
 class AuthException(BaseException):
-	pass
+    pass
+
 
 class DecodeException(BaseException):
-	pass
+    pass
