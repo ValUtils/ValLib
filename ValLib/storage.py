@@ -46,7 +46,7 @@ def utils_path():
 	if (envPath):
 		utilsPath = Path(envPath).absolute()
 	elif (platform.system() == "Windows"):
-		appdata = Path(getenv('APPDATA'))
+		appdata = Path(getenv('APPDATA', "."))
 		utilsPath = appdata / "ValUtils"
 		create_path(utilsPath)
 	elif (platform.system() == "Linux"):
