@@ -37,7 +37,7 @@ def linux_path():
 	xdg = getenv("XDG_CONFIG_HOME")
 	if (xdg):
 		return Path(xdg) / "ValUtils"
-	home = Path(getenv('HOME'))
+	home = Path().home()
 	return home / ".ValUtils"
 
 def utils_path():
