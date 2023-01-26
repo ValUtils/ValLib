@@ -32,9 +32,7 @@ def json_read(file):
 
 
 def create_path(path: Path):
-    if (path.is_dir()):
-        return
-    path.mkdir(parents=True)
+    path.mkdir(parents=True, exist_ok=True)
 
 
 def list_dir(dir: Path):
