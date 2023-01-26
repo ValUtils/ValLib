@@ -2,6 +2,7 @@ import platform
 import json
 from pathlib import Path
 from os import getenv
+from json.decoder import JSONDecodeError
 
 
 def save_to_drive(data, file):
@@ -25,10 +26,12 @@ def json_write(data, file):
 def json_read(file):
     try:
         rawData = read_from_drive(file)
-        data = json.loads(rawData)
-    except:
-        data = {}
-    return data
+        return json.loads(rawData)
+    except FileNotFoundError:
+        print(f"File not found: {file} at json_read")
+    except JSONDecodeError:
+        print(f"JSON Decode error in file {file}")
+    return {}
 
 
 def create_path(path: Path):
