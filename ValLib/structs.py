@@ -16,7 +16,7 @@ class Auth:
 
 
 @dataclass
-class AuthLoadout():
+class AuthLoadout:
     username: str
     region: str
     auth: Auth
