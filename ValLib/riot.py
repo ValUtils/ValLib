@@ -7,7 +7,7 @@ from requests.adapters import HTTPAdapter
 from .exceptions import AuthException
 from .structs import Auth, User
 from .parsing import encode_json, magic_decode
-from .version import riot_version, val_version
+from .version import Version
 
 platform = {
     "platformType": "PC",
@@ -31,7 +31,7 @@ FORCED_CIPHERS = [
 
 
 def get_user_agent():
-    version = riot_version()
+    version = Version().riot
     os = "(Windows;10;;Professional, x64)"
     userAgent = f"RiotClient/{version} rso-auth {os}"
     return userAgent
@@ -135,5 +135,5 @@ def make_headers(auth: Auth):
         'Authorization': f'Bearer {auth.access_token}',
         'X-Riot-Entitlements-JWT': auth.entitlements_token,
         'X-Riot-ClientPlatform': encode_json(platform),
-        'X-Riot-ClientVersion': val_version()
+        'X-Riot-ClientVersion': Version().valorant
     }

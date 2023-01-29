@@ -1,33 +1,28 @@
 import requests
 
 
-def val_api_version():
-    r = requests.get('https://valorant-api.com/v1/version')
-    data = r.json()['data']
-    val, riot = "", ""
-    if ("riotClientVersion" in data):
-        val = data["riotClientVersion"]
-    if ("riotClientBuild" in data):
-        riot = data["riotClientBuild"]
-    return val, riot
+class SingletonMeta(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
 
 
-def val_version():
-    get_versions()
-    return versions["valorant"]
+class Version(metaclass=SingletonMeta):
+    valorant: str = ""
+    riot: str = ""
 
+    def set_versions(self):
+        r = requests.get('https://valorant-api.com/v1/version')
+        data = r.json()['data']
+        if ("riotClientVersion" in data):
+            self.valorant = data["riotClientVersion"]
+        if ("riotClientBuild" in data):
+            self.riot = data["riotClientBuild"]
 
-def riot_version():
-    get_versions()
-    return versions["riot"]
-
-
-def get_versions():
-    global versions
-    if ("versions" in globals()):
-        return
-    val, riot = val_api_version()
-    versions = {
-        "valorant": val,
-        "riot": riot
-    }
+    def __init__(self):
+        if (not self.valorant):
+            self.set_versions()
