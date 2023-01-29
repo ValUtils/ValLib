@@ -13,7 +13,7 @@ add_path()
 
 def test_auth():
     import ValLib
-    username = getenv("USERNAME")
-    password = getenv("PASSWORD")
+    username = getenv("USERNAME", "")
+    password = getenv("PASSWORD", "")
     user = ValLib.User(username, password)
     return ValLib.authenticate(user)
