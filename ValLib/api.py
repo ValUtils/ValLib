@@ -52,7 +52,7 @@ def set_load_out(loadAuth: AuthLoadout, data):
     return data
 
 
-def get_region(auth: Auth):
+def get_region(auth: Auth) -> str:
     data = {
         "id_token": auth.id_token
     }
