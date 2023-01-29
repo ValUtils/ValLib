@@ -19,13 +19,13 @@ def decode_json(data):
 def magic_decode(string: str):
     try:
         return json.loads(string)
-    except:
+    except json.JSONDecodeError:
         pass
     try:
         return jwt.decode(string, options={"verify_signature": False})
-    except:
+    except jwt.exceptions.DecodeError:
         pass
-    raise DecodeException(string)
+    raise DecodeException
 
 
 def zdecode(b64string):
