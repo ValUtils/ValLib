@@ -61,7 +61,7 @@ def setup_session() -> requests.Session:
             return super(SSLAdapter, self).init_poolmanager(*args, **kwargs)
 
     session = requests.session()
-    session.headers = OrderedDict({
+    session.headers.update({
         "User-Agent": get_user_agent(),
         "Accept-Language": "en-US,en;q=0.9",
         "Accept": "application/json, text/plain, */*"
