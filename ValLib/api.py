@@ -2,7 +2,7 @@ import requests
 import json
 
 from .riot import make_headers
-from .structs import Auth, AuthLoadout
+from .structs import Auth, ExtraAuth
 from .parsing import *
 
 
@@ -36,18 +36,16 @@ def set_preference(auth: Auth, data):
     return req
 
 
-def get_load_out(loadAuth: AuthLoadout):
-    auth = loadAuth.auth
-    apiURL = f'https://pd.{loadAuth.region}.a.pvp.net/personalization/v2/players/{auth.user_id}/playerloadout'
+def get_load_out(auth: ExtraAuth):
+    apiURL = f'https://pd.{auth.region}.a.pvp.net/personalization/v2/players/{auth.user_id}/playerloadout'
     data = get_api(apiURL, auth)
     del data['Subject']
     del data['Version']
     return data
 
 
-def set_load_out(loadAuth: AuthLoadout, data):
-    auth = loadAuth.auth
-    apiURL = f'https://pd.{loadAuth.region}.a.pvp.net/personalization/v2/players/{auth.user_id}/playerloadout'
+def set_load_out(auth: ExtraAuth, data):
+    apiURL = f'https://pd.{auth.region}.a.pvp.net/personalization/v2/players/{auth.user_id}/playerloadout'
     data = put_api(apiURL, auth, data)
     return data
 

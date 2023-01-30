@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -16,7 +16,19 @@ class Auth:
 
 
 @dataclass
-class AuthLoadout:
+class ExtraAuth(Auth):
     username: str
     region: str
     auth: Auth
+    user_id: str = field(init=False)
+    id_token: str = field(init=False)
+    access_token: str = field(init=False)
+    entitlements_token: str = field(init=False)
+
+    def __post_init__(self):
+        if not self.auth:
+            return
+        self.user_id = self.auth.user_id
+        self.id_token = self.auth.id_token
+        self.access_token = self.auth.access_token
+        self.entitlements_token = self.auth.entitlements_token
