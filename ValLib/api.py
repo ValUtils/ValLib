@@ -50,6 +50,12 @@ def set_load_out(auth: ExtraAuth, data):
     return data
 
 
+def get_session(loadAuth: ExtraAuth):
+    region = loadAuth.region
+    apiURL = f"https://glz-{region}-1.{region}.a.pvp.net/session/v1/sessions/{loadAuth.user_id}"
+    return get_api(apiURL, loadAuth.auth)
+
+
 def get_region(auth: Auth) -> str:
     data = {
         "id_token": auth.id_token
