@@ -4,3 +4,7 @@ class AuthException(BaseException):
 
 class DecodeException(BaseException):
     pass
+
+
+class ValorantAPIError(Exception):
+    pass

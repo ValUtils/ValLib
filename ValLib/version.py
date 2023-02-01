@@ -1,5 +1,7 @@
 import requests
 
+from .exceptions import ValorantAPIError
+
 
 class SingletonMeta(type):
     _instances = {}
@@ -15,9 +17,15 @@ class Version(metaclass=SingletonMeta):
     valorant: str = ""
     riot: str = ""
 
-    def set_versions(self):
+    def fetch_versions(self):
         r = requests.get('https://valorant-api.com/v1/version')
-        data = r.json()['data']
+        if (not r.ok):
+            raise ValorantAPIError
+        data = r.json()["data"]
+        return data
+
+    def set_versions(self):
+        data = self.fetch_versions()
         if ("riotClientVersion" in data):
             self.valorant = data["riotClientVersion"]
         if ("riotClientBuild" in data):
