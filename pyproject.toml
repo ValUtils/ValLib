@@ -7,7 +7,7 @@ license = {text = "GPL-3.0"}
 keywords = ["valorant", "api", "auth"]
 dependencies = [
     "requests",
-    "jwt",
+    "pyjwt",
 ]
 requires-python = ">=3.8"
 
