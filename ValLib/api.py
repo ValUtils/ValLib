@@ -20,7 +20,7 @@ def put_api(url, auth: Auth, data):
 def get_preference(auth: Auth):
     apiURL = 'https://playerpreferences.riotgames.com/playerPref/v3/getPreference/Ares.PlayerSettings'
     jsonData = get_api(apiURL, auth)
-    if ("data" not in jsonData):
+    if "data" not in jsonData:
         return {}
     data = zloads(jsonData["data"])
     return data

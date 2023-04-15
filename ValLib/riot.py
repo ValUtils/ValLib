@@ -110,7 +110,7 @@ def get_auth_token(session: requests.Session, user: User):
     r = session.put(
         f'https://auth.riotgames.com/api/v1/authorization', json=data)
     data = r.json()
-    if ("error" in data):
+    if "error" in data:
         raise AuthException(data['error'])
     uri = data['response']['parameters']['uri']
     access_token, id_token = get_token(uri)
