@@ -18,7 +18,7 @@ class Version(metaclass=SingletonMeta):
     riot: str = ""
 
     def fetch_versions(self):
-        r = requests.get('https://valorant-api.com/v1/version')
+        r = requests.get("https://valorant-api.com/v1/version")
         if not r.ok:
             raise ValorantAPIError
         data = r.json()["data"]
