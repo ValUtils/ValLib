@@ -1,7 +1,6 @@
 import ssl
 import requests
 from typing import Any
-from collections import OrderedDict
 from requests.adapters import HTTPAdapter
 
 from .exceptions import AuthException
