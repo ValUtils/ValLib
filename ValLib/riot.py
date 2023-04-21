@@ -113,7 +113,7 @@ def get_auth_token(session: requests.Session, user: User):
         raise AuthException(data["error"])
     uri = data["response"]["parameters"]["uri"]
     access_token, id_token = get_token(uri)
-    return [access_token, id_token]
+    return access_token, id_token
 
 
 def get_entitlement(session: requests.Session, access_token):
