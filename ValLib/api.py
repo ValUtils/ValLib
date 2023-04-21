@@ -1,23 +1,25 @@
 import requests
 import json
 
+from requests import Response
+
 from .riot import make_headers
 from .structs import Auth, ExtraAuth
 from .parsing import *
 
 
-def get_api(url, auth: Auth):
+def get_api(url, auth: Auth) -> Any:
     r = requests.get(url, headers=make_headers(auth))
     jsonData = json.loads(r.text)
     return jsonData
 
 
-def put_api(url, auth: Auth, data):
+def put_api(url, auth: Auth, data) -> Response:
     req = requests.put(url, headers=make_headers(auth), json=data)
     return req
 
 
-def get_preference(auth: Auth):
+def get_preference(auth: Auth) -> Any:
     apiURL = "https://playerpreferences.riotgames.com/playerPref/v3/getPreference/Ares.PlayerSettings"
     jsonData = get_api(apiURL, auth)
     if "data" not in jsonData:
@@ -26,7 +28,7 @@ def get_preference(auth: Auth):
     return data
 
 
-def set_preference(auth: Auth, data):
+def set_preference(auth: Auth, data) -> Response:
     rawData = {
         "type": "Ares.PlayerSettings",
         "data": zdumps(data)
@@ -36,7 +38,7 @@ def set_preference(auth: Auth, data):
     return req
 
 
-def get_load_out(auth: ExtraAuth):
+def get_load_out(auth: ExtraAuth) -> Any:
     apiURL = f"https://pd.{auth.region}.a.pvp.net/personalization/v2/players/{auth.user_id}/playerloadout"
     data = get_api(apiURL, auth)
     del data['Subject']
@@ -44,7 +46,7 @@ def get_load_out(auth: ExtraAuth):
     return data
 
 
-def set_load_out(auth: ExtraAuth, data):
+def set_load_out(auth: ExtraAuth, data) -> Response:
     apiURL = f"https://pd.{auth.region}.a.pvp.net/personalization/v2/players/{auth.user_id}/playerloadout"
     data = put_api(apiURL, auth, data)
     return data

@@ -1,6 +1,7 @@
 import ssl
 import requests
-from typing import Any
+from typing import Any, Dict, Tuple
+from requests import Session
 from requests.adapters import HTTPAdapter
 
 from .exceptions import AuthException
@@ -29,20 +30,20 @@ FORCED_CIPHERS = [
 ]
 
 
-def get_user_agent():
+def get_user_agent() -> str:
     version = Version().riot
     os = "(Windows;10;;Professional, x64)"
     userAgent = f"RiotClient/{version} rso-auth {os}"
     return userAgent
 
 
-def get_token(uri: str):
+def get_token(uri: str) -> Tuple[str, str]:
     access_token = uri.split("access_token=")[1].split("&scope")[0]
     token_id = uri.split("id_token=")[1].split("&")[0]
     return access_token, token_id
 
 
-def post(session: requests.Session, access_token, url):
+def post(session: Session, access_token: str, url: str) -> Any:
     headers = {
         "Accept-Encoding": "gzip, deflate, br",
         "Authorization": f"Bearer {access_token}",
@@ -51,7 +52,7 @@ def post(session: requests.Session, access_token, url):
     return magic_decode(r.text)
 
 
-def setup_session() -> requests.Session:
+def setup_session() -> Session:
     class SSLAdapter(HTTPAdapter):
         def init_poolmanager(self, *args: Any, **kwargs: Any) -> None:
             ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
@@ -69,7 +70,7 @@ def setup_session() -> requests.Session:
     return session
 
 
-def authenticate(user: User):
+def authenticate(user: User) -> Auth:
     session = setup_session()
 
     setup_auth(session)
@@ -87,7 +88,7 @@ def authenticate(user: User):
     return auth
 
 
-def setup_auth(session: requests.Session):
+def setup_auth(session: Session):
     data = {
         "client_id": "riot-client",
         "nonce": "1",
@@ -99,7 +100,7 @@ def setup_auth(session: requests.Session):
     session.post(f"https://auth.riotgames.com/api/v1/authorization", json=data)
 
 
-def get_auth_token(session: requests.Session, user: User):
+def get_auth_token(session: Session, user: User) -> Tuple[str, str]:
     data = {
         "type": "auth",
         "username": user.username,
@@ -116,18 +117,18 @@ def get_auth_token(session: requests.Session, user: User):
     return access_token, id_token
 
 
-def get_entitlement(session: requests.Session, access_token):
+def get_entitlement(session: Session, access_token: str) -> str:
     data = post(session, access_token,
                 "https://entitlements.auth.riotgames.com/api/token/v1")
     return data["entitlements_token"]
 
 
-def get_user_info(session: requests.Session, access_token):
+def get_user_info(session: Session, access_token: str) -> str:
     data = post(session, access_token, "https://auth.riotgames.com/userinfo")
     return data["sub"]
 
 
-def make_headers(auth: Auth):
+def make_headers(auth: Auth) -> Dict[str, str]:
     return {
         "Accept-Encoding": "gzip, deflate, br",
         "User-Agent": get_user_agent(),
