@@ -47,10 +47,10 @@ def get_token(uri: str) -> Token:
     return token
 
 
-def post(session: Session, access_token: str, url: str) -> Any:
+def post(session: Session, token: Token, url: str) -> Any:
     headers = {
         "Accept-Encoding": "gzip, deflate, br",
-        "Authorization": f"Bearer {access_token}",
+        "Authorization": f"Bearer {token.access_token}",
     }
     r = session.post(url, headers=headers, json={})
     return magic_decode(r.text)
@@ -81,13 +81,13 @@ def authenticate(user: User, remember=False) -> Auth:
 
     token, cookies = get_auth_token(session, user, remember)
 
-    entitlements_token = get_entitlement(session, token.access)
+    entitlements_token = get_entitlement(session, token)
 
-    user_id = get_user_info(session, token.access)
+    user_id = get_user_info(session, token)
 
     session.close()
 
-    auth = Auth(token.access, token.id, entitlements_token, user_id, cookies)
+    auth = Auth(token, entitlements_token, user_id, cookies)
 
     return auth
 
@@ -125,14 +125,14 @@ def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token,
     return token, cookies
 
 
-def get_entitlement(session: Session, access_token: str) -> str:
-    data = post(session, access_token,
+def get_entitlement(session: Session, token: Token) -> str:
+    data = post(session, token,
                 "https://entitlements.auth.riotgames.com/api/token/v1")
     return data["entitlements_token"]
 
 
-def get_user_info(session: Session, access_token: str) -> str:
-    data = post(session, access_token, "https://auth.riotgames.com/userinfo")
+def get_user_info(session: Session, token: Token) -> str:
+    data = post(session, token, "https://auth.riotgames.com/userinfo")
     return data["sub"]
 
 
