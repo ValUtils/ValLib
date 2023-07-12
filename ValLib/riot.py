@@ -70,12 +70,12 @@ def setup_session() -> Session:
     return session
 
 
-def authenticate(user: User) -> Auth:
+def authenticate(user: User, remember=False) -> Auth:
     session = setup_session()
 
     setup_auth(session)
 
-    access_token, id_token = get_auth_token(session, user)
+    access_token, id_token, cookies = get_auth_token(session, user, remember)
 
     entitlements_token = get_entitlement(session, access_token)
 
@@ -83,7 +83,7 @@ def authenticate(user: User) -> Auth:
 
     session.close()
 
-    auth = Auth(access_token, id_token, entitlements_token, user_id)
+    auth = Auth(access_token, id_token, entitlements_token, user_id, cookies)
 
     return auth
 
@@ -100,21 +100,26 @@ def setup_auth(session: Session):
     session.post(f"https://auth.riotgames.com/api/v1/authorization", json=data)
 
 
-def get_auth_token(session: Session, user: User) -> Tuple[str, str]:
+def get_auth_token(session: Session, user: User, remember=False) -> Tuple[str, str, Dict[str, str]]:
     data = {
         "type": "auth",
         "username": user.username,
         "password": user.password
     }
 
+    if remember:
+        data["remember"] = "true"
+
     r = session.put(
         f"https://auth.riotgames.com/api/v1/authorization", json=data)
+    cookies = r.cookies.get_dict()
     data = r.json()
     if "error" in data:
         raise AuthException(data["error"])
     uri = data["response"]["parameters"]["uri"]
     access_token, id_token = get_token(uri)
-    return access_token, id_token
+
+    return access_token, id_token, cookies
 
 
 def get_entitlement(session: Session, access_token: str) -> str:
