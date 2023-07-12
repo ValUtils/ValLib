@@ -92,6 +92,26 @@ def authenticate(user: User, remember=False) -> Auth:
     return auth
 
 
+def cookie_token(cookies: Dict[str, str]):
+    session = setup_session()
+    session.cookies.update(cookies)
+
+    params = {
+        "client_id": "riot-client",
+        "nonce": "1",
+        "redirect_uri": "http://localhost/redirect",
+        "response_type": "token id_token",
+    }
+
+    r = session.get("https://auth.riotgames.com/authorize",
+                    params=params, allow_redirects=False)
+    if not r.next or not r.next.url:
+        raise AuthException()
+    token = get_token(r.next.url)
+    new_cookies = r.cookies.get_dict()
+    return token, new_cookies
+
+
 def setup_auth(session: Session):
     data = {
         "client_id": "riot-client",
