@@ -9,6 +9,13 @@ class User:
 
 
 @dataclass
+class Token():
+    access: str
+    id: str
+    expire: float
+
+
+@dataclass
 class Auth:
     access_token: str
     id_token: str

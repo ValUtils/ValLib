@@ -1,11 +1,12 @@
 import ssl
+import time
 import requests
 from typing import Any, Dict, Tuple
 from requests import Session
 from requests.adapters import HTTPAdapter
 
 from .exceptions import AuthException
-from .structs import Auth, User
+from .structs import Auth, User, Token
 from .parsing import encode_json, magic_decode
 from .version import Version
 
@@ -37,10 +38,13 @@ def get_user_agent() -> str:
     return userAgent
 
 
-def get_token(uri: str) -> Tuple[str, str]:
+def get_token(uri: str) -> Token:
     access_token = uri.split("access_token=")[1].split("&scope")[0]
     token_id = uri.split("id_token=")[1].split("&")[0]
-    return access_token, token_id
+    expires_in = uri.split("expires_in=")[1].split("&")[0]
+    timestamp = time.time() + float(expires_in)
+    token = Token(access_token, token_id, timestamp)
+    return token
 
 
 def post(session: Session, access_token: str, url: str) -> Any:
@@ -75,15 +79,15 @@ def authenticate(user: User, remember=False) -> Auth:
 
     setup_auth(session)
 
-    access_token, id_token, cookies = get_auth_token(session, user, remember)
+    token, cookies = get_auth_token(session, user, remember)
 
-    entitlements_token = get_entitlement(session, access_token)
+    entitlements_token = get_entitlement(session, token.access)
 
-    user_id = get_user_info(session, access_token)
+    user_id = get_user_info(session, token.access)
 
     session.close()
 
-    auth = Auth(access_token, id_token, entitlements_token, user_id, cookies)
+    auth = Auth(token.access, token.id, entitlements_token, user_id, cookies)
 
     return auth
 
@@ -100,7 +104,7 @@ def setup_auth(session: Session):
     session.post(f"https://auth.riotgames.com/api/v1/authorization", json=data)
 
 
-def get_auth_token(session: Session, user: User, remember=False) -> Tuple[str, str, Dict[str, str]]:
+def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token, Dict[str, str]]:
     data = {
         "type": "auth",
         "username": user.username,
@@ -117,9 +121,8 @@ def get_auth_token(session: Session, user: User, remember=False) -> Tuple[str, s
     if "error" in data:
         raise AuthException(data["error"])
     uri = data["response"]["parameters"]["uri"]
-    access_token, id_token = get_token(uri)
-
-    return access_token, id_token, cookies
+    token = get_token(uri)
+    return token, cookies
 
 
 def get_entitlement(session: Session, access_token: str) -> str:
