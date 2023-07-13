@@ -87,7 +87,7 @@ def authenticate(user: User, remember=False) -> Auth:
 
     session.close()
 
-    auth = Auth(token, entitlements_token, user_id, cookies)
+    auth = Auth(token, entitlements_token, user_id, remember, cookies)
 
     return auth
 
