@@ -8,6 +8,9 @@ class User:
     username: str
     password: str
 
+    def __hash__(self):
+        return hash(self.username)
+
 
 class Base:
     def __setattr__(self, name, value):
