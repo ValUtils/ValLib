@@ -35,7 +35,7 @@ class ExtraAuth(Auth):
     username: str
     region: str
     auth: Auth
-    token: str = field(init=False)
+    token: Token = field(init=False)
     user_id: str = field(init=False)
     entitlements_token: str = field(init=False)
     remember: bool = field(init=False)
