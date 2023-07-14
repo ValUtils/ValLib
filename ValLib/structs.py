@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field, is_dataclass
 from typing import Dict
+from time import time
 
 
 @dataclass
@@ -20,6 +21,7 @@ class Token(Base):
     access_token: str
     id_token: str
     expire: float
+    created = time()
 
 
 @dataclass
