@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field, is_dataclass
 from typing import Dict
 
 
@@ -8,8 +8,15 @@ class User:
     password: str
 
 
+class Base:
+    def __setattr__(self, name, value):
+        object.__setattr__(self, name, value)
+        if is_dataclass(value):
+            self.__dict__.update(value.__dict__)
+
+
 @dataclass
-class Token():
+class Token(Base):
     access_token: str
     id_token: str
     expire: float
@@ -26,9 +33,6 @@ class Auth(Token):
     id_token: str = field(init=False)
     expire: float = field(init=False)
 
-    def __post_init__(self):
-        super().__init__(**asdict(self.token))
-
 
 @dataclass
 class ExtraAuth(Auth):
@@ -40,6 +44,3 @@ class ExtraAuth(Auth):
     entitlements_token: str = field(init=False)
     remember: bool = field(init=False)
     cookies: Dict[str, str] = field(init=False)
-
-    def __post_init__(self):
-        super().__init__(**asdict(self.auth))
