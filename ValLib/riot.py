@@ -9,6 +9,7 @@ from .exceptions import AuthException
 from .structs import Auth, User, Token
 from .parsing import encode_json, magic_decode
 from .version import Version
+from .debug import Level, log
 
 platform = {
     "platformType": "PC",
@@ -35,10 +36,12 @@ def get_user_agent() -> str:
     version = Version().riot
     os = "(Windows;10;;Professional, x64)"
     userAgent = f"RiotClient/{version} rso-auth {os}"
+    log(Level.VERBOSE, userAgent)
     return userAgent
 
 
 def get_token(uri: str) -> Token:
+    log(Level.VERBOSE, uri)
     access_token = uri.split("access_token=")[1].split("&scope")[0]
     token_id = uri.split("id_token=")[1].split("&")[0]
     expires_in = uri.split("expires_in=")[1].split("&")[0]
@@ -48,6 +51,7 @@ def get_token(uri: str) -> Token:
 
 
 def post(session: Session, token: Token, url: str) -> Any:
+    log(Level.DEBUG, f"POST {url}", "network")
     headers = {
         "Accept-Encoding": "gzip, deflate, br",
         "Authorization": f"Bearer {token.access_token}",
@@ -57,6 +61,8 @@ def post(session: Session, token: Token, url: str) -> Any:
 
 
 def setup_session() -> Session:
+    log(Level.FULL, "Setting up session")
+
     class SSLAdapter(HTTPAdapter):
         def init_poolmanager(self, *args: Any, **kwargs: Any) -> None:
             ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
@@ -75,6 +81,9 @@ def setup_session() -> Session:
 
 
 def authenticate(user: User, remember=False) -> Auth:
+    log(Level.EXTRA, f"Authenticating {user.username}" +
+        (' with cookies' if remember else ''))
+
     session = setup_session()
 
     setup_auth(session)
@@ -93,6 +102,7 @@ def authenticate(user: User, remember=False) -> Auth:
 
 
 def cookie_token(cookies: Dict[str, str]):
+    log(Level.EXTRA, "Authenticating using cookies")
     session = setup_session()
     session.cookies.update(cookies)
 
@@ -113,6 +123,7 @@ def cookie_token(cookies: Dict[str, str]):
 
 
 def setup_auth(session: Session):
+    log(Level.EXTRA, "Setting up auth")
     data = {
         "client_id": "riot-client",
         "nonce": "1",
@@ -121,10 +132,13 @@ def setup_auth(session: Session):
         "scope": "account openid",
     }
 
-    session.post(f"https://auth.riotgames.com/api/v1/authorization", json=data)
+    url = "https://auth.riotgames.com/api/v1/authorization"
+    log(Level.DEBUG, f"POST {url}", "network")
+    session.post(url, json=data)
 
 
 def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token, Dict[str, str]]:
+    log(Level.FULL, "Getting auth token")
     data = {
         "type": "auth",
         "username": user.username,
@@ -134,8 +148,9 @@ def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token,
     if remember:
         data["remember"] = "true"
 
-    r = session.put(
-        f"https://auth.riotgames.com/api/v1/authorization", json=data)
+    url = "https://auth.riotgames.com/api/v1/authorization"
+    log(Level.DEBUG, f"PUT {url}", "network")
+    r = session.put(url, json=data)
     cookies = r.cookies.get_dict()
     data = r.json()
     if "error" in data:
@@ -146,17 +161,20 @@ def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token,
 
 
 def get_entitlement(session: Session, token: Token) -> str:
+    log(Level.FULL, "Getting entitlement token")
     data = post(session, token,
                 "https://entitlements.auth.riotgames.com/api/token/v1")
     return data["entitlements_token"]
 
 
 def get_user_info(session: Session, token: Token) -> str:
+    log(Level.FULL, "Getting user info")
     data = post(session, token, "https://auth.riotgames.com/userinfo")
     return data["sub"]
 
 
 def make_headers(auth: Auth) -> Dict[str, str]:
+    log(Level.VERBOSE, auth)
     return {
         "Accept-Encoding": "gzip, deflate, br",
         "User-Agent": get_user_agent(),

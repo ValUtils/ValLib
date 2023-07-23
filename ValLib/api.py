@@ -5,17 +5,26 @@ from requests import Response
 
 from .riot import make_headers
 from .structs import Auth, ExtraAuth
+from .debug import Level, log
 from .parsing import *
 
 
 def get_api(url, auth: Auth) -> Any:
+    log(Level.DEBUG, f"GET {url}", "network")
     r = requests.get(url, headers=make_headers(auth))
     jsonData = json.loads(r.text)
     return jsonData
 
 
 def put_api(url, auth: Auth, data) -> Response:
+    log(Level.DEBUG, f"PUT {url}", "network")
     req = requests.put(url, headers=make_headers(auth), json=data)
+    return req
+
+
+def post_api(url, auth: Auth, data):
+    log(Level.DEBUG, f"POST {url}", "network")
+    req = requests.post(url, headers=make_headers(auth), json=data)
     return req
 
 

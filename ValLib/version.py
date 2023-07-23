@@ -1,6 +1,7 @@
 import requests
 
 from .exceptions import ValorantAPIError
+from .debug import Level, log
 
 
 class SingletonMeta(type):
@@ -18,6 +19,7 @@ class Version(metaclass=SingletonMeta):
     riot: str = ""
 
     def fetch_versions(self):
+        log(Level.DEBUG, "Fetching versions")
         r = requests.get("https://valorant-api.com/v1/version")
         if not r.ok:
             raise ValorantAPIError
@@ -25,11 +27,14 @@ class Version(metaclass=SingletonMeta):
         return data
 
     def set_versions(self):
+        log(Level.FULL, "Setting Riot Versions")
         data = self.fetch_versions()
         if "riotClientVersion" in data:
             self.valorant = data["riotClientVersion"]
+            log(Level.DEBUG, "Valorant " + data["riotClientVersion"])
         if "riotClientBuild" in data:
             self.riot = data["riotClientBuild"]
+            log(Level.DEBUG, "RiotClient " + data["riotClientBuild"])
 
     def __init__(self):
         if not self.valorant:
