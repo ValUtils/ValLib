@@ -29,7 +29,7 @@ class Token(Base):
 
 @dataclass
 class Auth(Token):
-    token: Token
+    token: Token = field(repr=False)
     entitlements_token: str
     user_id: str
     remember: bool
@@ -43,7 +43,7 @@ class Auth(Token):
 class ExtraAuth(Auth):
     username: str
     region: str
-    auth: Auth
+    auth: Auth = field(repr=False)
     token: Token = field(init=False)
     user_id: str = field(init=False)
     entitlements_token: str = field(init=False)
