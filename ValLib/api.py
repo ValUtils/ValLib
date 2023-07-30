@@ -1,12 +1,12 @@
-import requests
 import json
 
+import requests
 from requests import Response
 
+from .parsing import *
+from .debug import Level, log
 from .riot import make_headers
 from .structs import Auth, ExtraAuth
-from .debug import Level, log
-from .parsing import *
 
 
 def get_api(url, auth: Auth) -> Any:

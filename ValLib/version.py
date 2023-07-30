@@ -1,7 +1,7 @@
 import requests
 
-from .exceptions import ValorantAPIError
 from .debug import Level, log
+from .exceptions import ValorantAPIError
 
 
 class SingletonMeta(type):

@@ -1,13 +1,13 @@
-import json
-import jwt
 import base64
+import json
 import zlib
-
-from typing import Any
 from reprlib import aRepr
+from typing import Any
 
-from .exceptions import DecodeException
+import jwt
+
 from .debug import Level, log
+from .exceptions import DecodeException
 
 
 def encode_json(data: Any) -> str:

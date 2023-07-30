@@ -1,5 +1,5 @@
 from .structs import *
-from .riot import make_headers, authenticate
+from .riot import authenticate, make_headers
 
 __all__ = [
     "authenticate",

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field, is_dataclass
-from typing import Dict
 from time import time
+from typing import Dict
 
 
 @dataclass

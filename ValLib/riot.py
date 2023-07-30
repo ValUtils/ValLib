@@ -1,15 +1,16 @@
 import ssl
 import time
-import requests
 from typing import Any, Dict, Tuple
+
+import requests
 from requests import Session
 from requests.adapters import HTTPAdapter
 
-from .exceptions import AuthException
-from .structs import Auth, User, Token
-from .parsing import encode_json, magic_decode
-from .version import Version
 from .debug import Level, log
+from .exceptions import AuthException
+from .parsing import encode_json, magic_decode
+from .structs import Auth, Token, User
+from .version import Version
 
 platform = {
     "platformType": "PC",
