@@ -18,6 +18,14 @@ def get_env(logger: logging.Logger, key: str, default):
     return getenv(f"{logger.name}_{key}", default)
 
 
+def bool_env(logger: logging.Logger, key: str, default: bool):
+    return bool(int(get_env(logger, key, default)))
+
+
+def int_env(logger: logging.Logger, key: str, default: int):
+    return int(get_env(logger, key, default))
+
+
 def add_levels():
     for l in Level:
         logging.addLevelName(l, str(l).split(".")[1])
@@ -39,12 +47,12 @@ def file_out(logger: logging.Logger, path: Path):
 
 
 def env_setup(logger: logging.Logger):
-    level = int(get_env(logger, "LOG_LEVEL", Level.INFO))
+    level = int_env(logger, "LOG_LEVEL", Level.INFO)
     logger.setLevel(level)
-    console = bool(int(get_env(logger, "LOG_CONSOLE", True)))
+    console = bool_env(logger, "LOG_CONSOLE", True)
     if console:
         stderr(logger)
-    file = bool(int(get_env(logger, "LOG_FILE_ENABLE", False)))
+    file = bool_env(logger, "LOG_FILE_ENABLE", False)
     file_path = Path(get_env(logger, "LOG_FILE", ""))
     if file:
         file_out(logger, file_path)
