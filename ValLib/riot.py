@@ -33,6 +33,16 @@ FORCED_CIPHERS = [
 ]
 
 
+def post(session: Session, token: Token, url: str) -> Any:
+    log(Level.DEBUG, f"POST {url}", "network")
+    headers = {
+        "Accept-Encoding": "gzip, deflate, br",
+        "Authorization": f"Bearer {token.access_token}",
+    }
+    r = session.post(url, headers=headers, json={})
+    return magic_decode(r.text)
+
+
 def get_user_agent() -> str:
     version = Version().riot
     os = "(Windows;10;;Professional, x64)"
@@ -61,16 +71,6 @@ def get_auth_data(response: Response):
     return token, cookies
 
 
-def post(session: Session, token: Token, url: str) -> Any:
-    log(Level.DEBUG, f"POST {url}", "network")
-    headers = {
-        "Accept-Encoding": "gzip, deflate, br",
-        "Authorization": f"Bearer {token.access_token}",
-    }
-    r = session.post(url, headers=headers, json={})
-    return magic_decode(r.text)
-
-
 def setup_session() -> Session:
     log(Level.FULL, "Setting up session")
 
@@ -89,6 +89,22 @@ def setup_session() -> Session:
     })
     session.mount("https://", SSLAdapter())
     return session
+
+
+def setup_auth(session: Session):
+    log(Level.EXTRA, "Setting up auth")
+    data = {
+        "client_id": "riot-client",
+        "nonce": "1",
+        "redirect_uri": "http://localhost/redirect",
+        "response_type": "token id_token",
+        "scope": "account openid",
+    }
+
+    url = "https://auth.riotgames.com/api/v1/authorization"
+    log(Level.DEBUG, f"POST {url}", "network")
+    r = session.post(url, json=data)
+    return r
 
 
 def authenticate(user: User, remember=False) -> Auth:
@@ -119,22 +135,6 @@ def cookie_token(cookies: Dict[str, str]):
     r = setup_auth(session)
     token, new_cookies = get_auth_data(r)
     return token, new_cookies
-
-
-def setup_auth(session: Session):
-    log(Level.EXTRA, "Setting up auth")
-    data = {
-        "client_id": "riot-client",
-        "nonce": "1",
-        "redirect_uri": "http://localhost/redirect",
-        "response_type": "token id_token",
-        "scope": "account openid",
-    }
-
-    url = "https://auth.riotgames.com/api/v1/authorization"
-    log(Level.DEBUG, f"POST {url}", "network")
-    r = session.post(url, json=data)
-    return r
 
 
 def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token, Dict[str, str]]:
