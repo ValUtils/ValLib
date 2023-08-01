@@ -43,10 +43,10 @@ def post(session: Session, token: Token, url: str) -> Any:
     return magic_decode(r.text)
 
 
-def get_user_agent() -> str:
+def get_user_agent(app="rso-auth") -> str:
     version = Version().riot
     os = "(Windows;10;;Professional, x64)"
-    userAgent = f"RiotClient/{version} rso-auth {os}"
+    userAgent = f"RiotClient/{version} {app} {os}"
     log(Level.VERBOSE, userAgent)
     return userAgent
 
@@ -157,8 +157,16 @@ def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token,
 
 def get_entitlement(session: Session, token: Token) -> str:
     log(Level.FULL, "Getting entitlement token")
-    data = post(session, token,
-                "https://entitlements.auth.riotgames.com/api/token/v1")
+
+    url = "https://entitlements.auth.riotgames.com/api/token/v1"
+    headers = {
+        "Accept-Encoding": "gzip, deflate, br",
+        "Authorization": f"Bearer {token.access_token}",
+        "User-Agent": get_user_agent("entitlements"),
+    }
+
+    r = session.post(url, headers=headers, json={})
+    data = magic_decode(r.text)
     return data["entitlements_token"]
 
 
