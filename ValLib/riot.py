@@ -3,7 +3,7 @@ import time
 from typing import Any, Dict, Tuple
 
 import requests
-from requests import Session
+from requests import Response, Session
 from requests.adapters import HTTPAdapter
 
 from .debug import Level, log
@@ -49,6 +49,16 @@ def get_token(uri: str) -> Token:
     timestamp = time.time() + float(expires_in)
     token = Token(access_token, token_id, timestamp)
     return token
+
+
+def get_auth_data(response: Response):
+    cookies = response.cookies.get_dict()
+    data = response.json()
+    if "error" in data:
+        raise AuthException(data["error"])
+    uri = data["response"]["parameters"]["uri"]
+    token = get_token(uri)
+    return token, cookies
 
 
 def post(session: Session, token: Token, url: str) -> Any:
@@ -106,21 +116,8 @@ def cookie_token(cookies: Dict[str, str]):
     log(Level.EXTRA, "Authenticating using cookies")
     session = setup_session()
     session.cookies.update(cookies)
-
-    params = {
-        "client_id": "riot-client",
-        "nonce": "1",
-        "redirect_uri": "http://localhost/redirect",
-        "response_type": "token id_token",
-        "scope": "account openid",
-    }
-
-    r = session.get("https://auth.riotgames.com/authorize",
-                    params=params, allow_redirects=False)
-    if not r.next or not r.next.url:
-        raise AuthException()
-    token = get_token(r.next.url)
-    new_cookies = r.cookies.get_dict()
+    r = setup_auth(session)
+    token, new_cookies = get_auth_data(r)
     return token, new_cookies
 
 
@@ -136,7 +133,8 @@ def setup_auth(session: Session):
 
     url = "https://auth.riotgames.com/api/v1/authorization"
     log(Level.DEBUG, f"POST {url}", "network")
-    session.post(url, json=data)
+    r = session.post(url, json=data)
+    return r
 
 
 def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token, Dict[str, str]]:
@@ -153,12 +151,7 @@ def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token,
     url = "https://auth.riotgames.com/api/v1/authorization"
     log(Level.DEBUG, f"PUT {url}", "network")
     r = session.put(url, json=data)
-    cookies = r.cookies.get_dict()
-    data = r.json()
-    if "error" in data:
-        raise AuthException(data["error"])
-    uri = data["response"]["parameters"]["uri"]
-    token = get_token(uri)
+    token, cookies = get_auth_data(r)
     return token, cookies
 
 
