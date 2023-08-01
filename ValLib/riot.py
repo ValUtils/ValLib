@@ -112,6 +112,7 @@ def cookie_token(cookies: Dict[str, str]):
         "nonce": "1",
         "redirect_uri": "http://localhost/redirect",
         "response_type": "token id_token",
+        "scope": "account openid",
     }
 
     r = session.get("https://auth.riotgames.com/authorize",
