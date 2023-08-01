@@ -17,3 +17,12 @@ def test_auth():
     password = getenv("PASSWORD", "")
     user = ValLib.User(username, password)
     return ValLib.authenticate(user)
+
+
+def test_cookie_auth():
+    import ValLib
+    username = getenv("USERNAME", "")
+    password = getenv("PASSWORD", "")
+    user = ValLib.User(username, password)
+    auth = ValLib.authenticate(user, remember=True)
+    return ValLib.cookie_token(auth.cookies)
