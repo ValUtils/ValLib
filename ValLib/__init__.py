@@ -1,8 +1,8 @@
 from .structs import *
-from .riot import authenticate, make_headers
+from .riot import authenticate, cookie_token, make_headers
 
 __all__ = [
-    "authenticate",
-    "User", "Auth",
+    "authenticate", "cookie_token",
+    "User", "Auth", "Token",
     "make_headers",
 ]
