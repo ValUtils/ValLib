@@ -58,3 +58,11 @@ def zdumps(data: Any) -> str:
     log(Level.VERBOSE, aRepr.repr(data))
     stringify = json.dumps(data).encode("utf-8")
     return zencode(stringify).decode("utf-8")
+
+
+__all__ = [
+    "encode_json", "decode_json",
+    "zdecode", "zencode",
+    "zloads", "zdumps",
+    "magic_decode"
+]

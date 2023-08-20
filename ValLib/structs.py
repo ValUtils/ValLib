@@ -49,3 +49,5 @@ class ExtraAuth(Auth):
     entitlements_token: str = field(init=False)
     remember: bool = field(init=False)
     cookies: Dict[str, str] = field(init=False)
+
+__all__ = ["User", "Token", "Auth", "ExtraAuth"]
