@@ -15,7 +15,7 @@ from .version import Version
 platform = {
     "platformType": "PC",
     "platformOS": "Windows",
-    "platformOSVersion": "10.0.19045.1.256.64bit",
+    "platformOSVersion": "10.0.22621.1.768.64bit",
     "platformChipset": "Unknown"
 }
 
