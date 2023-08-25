@@ -1,4 +1,5 @@
 import time
+from secrets import token_urlsafe
 from typing import Any, Dict, Tuple
 
 import httpx
@@ -61,8 +62,12 @@ def setup_session() -> Client:
     session = httpx.Client()
     session.headers.update({
         "User-Agent": get_user_agent(),
-        "Accept-Language": "en-US,en;q=0.9",
-        "Accept": "application/json, text/plain, */*"
+        "Cache-Control": "no-cache",
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+    })
+    session.cookies.update({
+        "tdid": "", "asid": "", "did": "", "clid": ""
     })
     return session
 
@@ -71,7 +76,7 @@ def setup_auth(session: Client):
     log(Level.EXTRA, "Setting up auth")
     data = {
         "client_id": "riot-client",
-        "nonce": "1",
+        "nonce": token_urlsafe(16),
         "redirect_uri": "http://localhost/redirect",
         "response_type": "token id_token",
         "scope": "account openid",
