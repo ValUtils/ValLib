@@ -6,7 +6,7 @@ authors = [{ name = "PWall" }]
 license = {text = "GPL-3.0"}
 keywords = ["valorant", "api", "auth"]
 dependencies = [
-    "requests",
+    "httpx",
     "pyjwt",
 ]
 requires-python = ">=3.8"
