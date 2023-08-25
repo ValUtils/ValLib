@@ -1,10 +1,8 @@
-import ssl
 import time
 from typing import Any, Dict, Tuple
 
-import requests
-from requests import Response, Session
-from requests.adapters import HTTPAdapter
+import httpx
+from httpx import Client, Response
 
 from .debug import Level, log
 from .exceptions import AuthException
@@ -19,21 +17,8 @@ platform = {
     "platformChipset": "Unknown"
 }
 
-FORCED_CIPHERS = [
-    "ECDHE-ECDSA-AES128-GCM-SHA256",
-    "ECDHE-ECDSA-CHACHA20-POLY1305",
-    "ECDHE-RSA-AES128-GCM-SHA256",
-    "ECDHE-RSA-CHACHA20-POLY1305",
-    "ECDHE+AES128",
-    "RSA+AES128",
-    "ECDHE+AES256",
-    "RSA+AES256",
-    "ECDHE+3DES",
-    "RSA+3DES"
-]
 
-
-def post(session: Session, token: Token, url: str) -> Any:
+def post(session: Client, token: Token, url: str) -> Any:
     log(Level.DEBUG, f"POST {url}", "network")
     headers = {
         "Accept-Encoding": "gzip, deflate, br",
@@ -62,7 +47,7 @@ def get_token(uri: str) -> Token:
 
 
 def get_auth_data(response: Response):
-    cookies = response.cookies.get_dict()
+    cookies = dict(response.cookies)
     data = response.json()
     if "error" in data:
         raise AuthException(data["error"])
@@ -71,27 +56,18 @@ def get_auth_data(response: Response):
     return token, cookies
 
 
-def setup_session() -> Session:
+def setup_session() -> Client:
     log(Level.FULL, "Setting up session")
-
-    class SSLAdapter(HTTPAdapter):
-        def init_poolmanager(self, *args: Any, **kwargs: Any) -> None:
-            ctx = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
-            ctx.set_ciphers(":".join(FORCED_CIPHERS))
-            kwargs["ssl_context"] = ctx
-            return super(SSLAdapter, self).init_poolmanager(*args, **kwargs)
-
-    session = requests.session()
+    session = httpx.Client()
     session.headers.update({
         "User-Agent": get_user_agent(),
         "Accept-Language": "en-US,en;q=0.9",
         "Accept": "application/json, text/plain, */*"
     })
-    session.mount("https://", SSLAdapter())
     return session
 
 
-def setup_auth(session: Session):
+def setup_auth(session: Client):
     log(Level.EXTRA, "Setting up auth")
     data = {
         "client_id": "riot-client",
@@ -137,7 +113,7 @@ def cookie_token(cookies: Dict[str, str]):
     return token, new_cookies
 
 
-def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token, Dict[str, str]]:
+def get_auth_token(session: Client, user: User, remember=False) -> Tuple[Token, Dict[str, str]]:
     log(Level.FULL, "Getting auth token")
     data = {
         "type": "auth",
@@ -155,7 +131,7 @@ def get_auth_token(session: Session, user: User, remember=False) -> Tuple[Token,
     return token, cookies
 
 
-def get_entitlement(session: Session, token: Token) -> str:
+def get_entitlement(session: Client, token: Token) -> str:
     log(Level.FULL, "Getting entitlement token")
 
     url = "https://entitlements.auth.riotgames.com/api/token/v1"
@@ -170,7 +146,7 @@ def get_entitlement(session: Session, token: Token) -> str:
     return data["entitlements_token"]
 
 
-def get_user_info(session: Session, token: Token) -> str:
+def get_user_info(session: Client, token: Token) -> str:
     log(Level.FULL, "Getting user info")
     data = post(session, token, "https://auth.riotgames.com/userinfo")
     return data["sub"]
