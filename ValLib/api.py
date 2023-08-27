@@ -5,8 +5,8 @@ import requests
 from requests import Response
 
 from .parsing import *
+from .auth import make_headers
 from .debug import Level, log
-from .riot import make_headers
 from .structs import Auth, ExtraAuth
 
 
