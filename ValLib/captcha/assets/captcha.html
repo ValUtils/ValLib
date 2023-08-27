@@ -1,0 +1,85 @@
+<html lang="en">
+    <!--
+        Copyright:
+            Github @hawolt
+            Twitter @hawolt
+     -->
+    <head>
+        <title>Solve hCaptcha</title>
+        <meta charset="UTF-8" />
+        <style>
+            @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+            body {
+                font-family: Roboto, Courier, monospace;
+                margin: 0;
+                background-color: #1f2937;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                justify-content: center;
+                gap: 30px;
+            }
+            h1 {
+                color: #f9faf8;
+            }
+            button {
+                background-color: #006400;
+                color: #f9faf8;
+                border: none;
+                padding: 10px 20px;
+                width: 150px;
+                cursor: pointer;
+                border-radius: 10px;
+                font-size: 16px;
+                transition: background-color 0.2s ease;
+                margin-top: 30px;
+            }
+            button:hover {
+                background-color: #183d3d;
+            }
+            .h-captcha {
+                min-height: 94px; /* min height of hcaptcha iframe (64px) + margin (30px), so it wouldn't "jump"*/
+            }
+        </style>
+        <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+        <script>
+            window.onload = async () => {
+                const response = await fetch("/v1/hcaptcha/rqdata");
+                const data = await response.text();
+                hcaptcha.setData("", { rqdata: data });
+
+                const form = document.querySelector("#hcaptcha-form");
+                form.onsubmit = (e) => {
+                    e.preventDefault();
+                    const element = document.getElementsByName("h-captcha-response")[0];
+                    const data = element.value;
+                    submitToBackend(data);
+                };
+            };
+
+            const submitToBackend = async (token) => {
+                const response = await fetch("/v1/hcaptcha/response", {
+                    method: "POST",
+                    body: token,
+                });
+                if (response.ok) {
+                    window.close();
+                    return;
+                }
+                alert("Check if the hCaptcha is done correctly, if not please report this error on GitHub.");
+            };
+        </script>
+    </head>
+    <body>
+        <h1>Log in with this simple hCaptcha</h1>
+        <form action="/" method="POST" id="hcaptcha-form">
+            <div
+                class="h-captcha"
+                data-sitekey="SITE_KEY"
+                data-theme="dark"
+            ></div>
+            <button type="submit">Continue</button>
+        </form>
+    </body>
+</html>

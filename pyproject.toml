@@ -27,3 +27,6 @@ push = true
     'current_version = "{version}"',
     'version = "{version}"',
 ]
+
+[tool.setuptools.package-data]
+"ValLib.captcha.assets" = ["*.html"]

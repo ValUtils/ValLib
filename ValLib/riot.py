@@ -5,6 +5,7 @@ from typing import Any, Dict, Tuple
 import httpx
 from httpx import Client, Response
 
+from .captcha import solver
 from .debug import Level, log
 from .exceptions import AuthException
 from .parsing import encode_json, magic_decode
@@ -47,16 +48,6 @@ def get_token(uri: str) -> Token:
     return token
 
 
-def get_auth_data(response: Response):
-    cookies = dict(response.cookies)
-    data = response.json()
-    if "error" in data:
-        raise AuthException(data["error"])
-    uri = data["response"]["parameters"]["uri"]
-    token = get_token(uri)
-    return token, cookies
-
-
 def setup_session() -> Client:
     log(Level.FULL, "Setting up session")
     session = httpx.Client()
@@ -88,6 +79,84 @@ def setup_auth(session: Client):
     return r
 
 
+def get_auth_data(session: Client):
+    r = setup_auth(session)
+    cookies = dict(r.cookies)
+    data = r.json()
+    if "error" in data:
+        raise AuthException(data["error"])
+    uri = data["response"]["parameters"]["uri"]
+    token = get_token(uri)
+    return token, cookies
+
+
+def solve_captcha(data: Dict[str, Any]):
+    token = data["captcha"]["hcaptcha"]["data"]
+    key = data["captcha"]["hcaptcha"]["key"]
+    return solver.token(token, key)
+
+
+def get_captcha_token(session: Client):
+    data = {
+        "clientId": "riot-client",
+        "language": "",
+        "platform": "windows",
+        "remember": False,
+        "riot_identity": {
+            "language": "en_GB",
+            "state": "auth",
+        },
+        "sdkVersion": Version().sdk,
+        "type": "auth",
+    }
+    url = "https://authenticate.riotgames.com/api/v1/login"
+    log(Level.DEBUG, f"POST {url}", "network")
+    r = session.post(url, json=data)
+    response_data = r.json()
+    return response_data
+
+
+def get_login_token(session: Client, user: User, code: str):
+    data = {
+        "riot_identity": {
+            "captcha": f"hcaptcha {code}",
+            "language": "en_GB",
+            "password": user.password,
+            "remember": False,
+            "username": user.username
+        },
+        "type": "auth"
+    }
+    url = "https://authenticate.riotgames.com/api/v1/login"
+    log(Level.DEBUG, f"PUT {url}", "network")
+    r = session.put(url, json=data)
+    response_data = r.json()
+    return response_data["success"]["login_token"]
+
+
+def login_cookies(session: Client, login_token: str):
+    data = {
+        "authentication_type": "RiotAuth",
+        "code_verifier": "",
+        "login_token": login_token,
+        "persist_login": False
+    }
+
+    url = "https://auth.riotgames.com/api/v1/login-token"
+    log(Level.DEBUG, f"POST {url}", "network")
+    session.post(url, json=data)
+
+
+def captcha_flow(session: Client, user: User):
+    captcha_data = get_captcha_token(session)
+
+    captcha_token = solve_captcha(captcha_data)
+
+    login_token = get_login_token(session, user, captcha_token)
+
+    login_cookies(session, login_token)
+
+
 def authenticate(user: User, remember=False) -> Auth:
     log(Level.EXTRA, f"Authenticating {user.username}" +
         (' with cookies' if remember else ''))
@@ -96,7 +165,9 @@ def authenticate(user: User, remember=False) -> Auth:
 
     setup_auth(session)
 
-    token, cookies = get_auth_token(session, user, remember)
+    captcha_flow(session, user)
+
+    token, cookies = get_auth_data(session)
 
     entitlements_token = get_entitlement(session, token)
 
@@ -113,27 +184,8 @@ def cookie_token(cookies: Dict[str, str]):
     log(Level.EXTRA, "Authenticating using cookies")
     session = setup_session()
     session.cookies.update(cookies)
-    r = setup_auth(session)
-    token, new_cookies = get_auth_data(r)
+    token, new_cookies = get_auth_data(session)
     return token, new_cookies
-
-
-def get_auth_token(session: Client, user: User, remember=False) -> Tuple[Token, Dict[str, str]]:
-    log(Level.FULL, "Getting auth token")
-    data = {
-        "type": "auth",
-        "username": user.username,
-        "password": user.password
-    }
-
-    if remember:
-        data["remember"] = "true"
-
-    url = "https://auth.riotgames.com/api/v1/authorization"
-    log(Level.DEBUG, f"PUT {url}", "network")
-    r = session.put(url, json=data)
-    token, cookies = get_auth_data(r)
-    return token, cookies
 
 
 def get_entitlement(session: Client, token: Token) -> str:
