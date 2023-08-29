@@ -44,7 +44,7 @@ def int_env(logger: logging.Logger, key: str, default: int):
 
 def add_levels():
     for l in Level:
-        logging.addLevelName(l, str(l).split(".")[1])
+        logging.addLevelName(l, l.name)
 
 
 def stderr(logger: logging.Logger):
