@@ -4,6 +4,7 @@ from webbrowser import open as open_url
 
 from .exceptions import HCaptchaTimeoutException
 from .handler import CaptchaHandler
+from .port import random_port
 from .struct import CaptchaSolver
 
 
@@ -14,7 +15,8 @@ class WebServerSolver(CaptchaSolver):
     _timeout: int
     result: str
 
-    def __init__(self, address="localhost", port=8080, timeout=30):
+    def __init__(self, address="localhost", timeout=30):
+        port = next(random_port())
         self._address = address
         self._port = port
         self._timeout = timeout
