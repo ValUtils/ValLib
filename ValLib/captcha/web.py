@@ -1,6 +1,5 @@
 from http.server import ThreadingHTTPServer as HTTPServer
 from threading import Timer
-from time import sleep
 from webbrowser import open as open_url
 
 from .exceptions import HCaptchaTimeoutException
