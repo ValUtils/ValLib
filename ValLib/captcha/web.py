@@ -30,6 +30,7 @@ class WebServerSolver(CaptchaSolver):
         if self._timeout <= 0:
             return
 
+        #! Careful race condition, easy solve with t.cancel()
         t = Timer(interval=self._timeout,
                   function=self._server.shutdown)
         t.setDaemon(True)
