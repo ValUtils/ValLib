@@ -1,5 +1,5 @@
 from http.server import ThreadingHTTPServer as HTTPServer
-from threading import Thread
+from threading import Timer
 from time import sleep
 from webbrowser import open as open_url
 
@@ -30,11 +30,11 @@ class WebServerSolver(CaptchaSolver):
         if self._timeout <= 0:
             return
 
-        def timeout():
-            sleep(self._timeout)
-            self._server.shutdown()
-
-        Thread(target=timeout).start()
+        t = Timer(interval=self._timeout,
+                  function=self._server.shutdown)
+        t.setDaemon(True)
+        t.start()
+        return t
 
     def token(self, rqdata: str, site_key: str):
         CaptchaHandler.rqdata = rqdata
