@@ -1,4 +1,4 @@
-import requests
+import httpx
 
 from .debug import Level, log
 from .exceptions import ValorantAPIError
@@ -21,16 +21,16 @@ class Version(metaclass=SingletonMeta):
 
     def fetch_versions(self):
         log(Level.DEBUG, "Fetching versions")
-        r = requests.get("https://valorant-api.com/v1/version")
-        if not r.ok:
+        r = httpx.get("https://valorant-api.com/v1/version")
+        if r.is_error:
             raise ValorantAPIError
         data = r.json()["data"]
         return data
 
     def fetch_sketchy(self):
         log(Level.DEBUG, "Fetching sketchy versions")
-        r = requests.get("https://valorant-api.com/internal/ritoclientversion")
-        if not r.ok:
+        r = httpx.get("https://valorant-api.com/internal/ritoclientversion")
+        if r.is_error:
             raise ValorantAPIError
         data = r.json()["data"]
         return data
