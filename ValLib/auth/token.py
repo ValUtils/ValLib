@@ -14,6 +14,9 @@ def get_auth_data(session: Client):
     data = r.json()
     if "error" in data:
         raise AuthException(data["error"])
+    if "response" not in data:
+        msg = "Missing params from auth response, ussually invalid cookies"
+        raise AuthException(msg)
     uri = data["response"]["parameters"]["uri"]
     token = get_token(uri)
     return token, cookies

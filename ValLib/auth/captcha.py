@@ -4,6 +4,7 @@ from httpx import Client
 
 from ..captcha import solver
 from ..debug import Level, log
+from ..exceptions import AuthException
 from ..structs import User
 from ..version import Version
 
@@ -49,6 +50,8 @@ def get_login_token(session: Client, user: User, code: str):
     log(Level.DEBUG, f"PUT {url}", "network")
     r = session.put(url, json=data)
     response_data = r.json()
+    if response_data["type"] != "success":
+        raise AuthException("Wrong password or 2fa")
     return response_data["success"]["login_token"]
 
 
