@@ -94,6 +94,30 @@ Inside `ValLib.api` there are this customs methods:
 - `set_load_out` to set the loadout (cosmetics + incognito) for Valorant
 - `get_session` to grab information about the current Valorant session
 
+### Custom Captcha provider
+
+If you need to make automatic auth or just need another way of dealing with captcha you can make your own `CaptchaSolver` class. Here is an example how to do so:
+
+```python
+import ValLib
+import requests
+from ValLib.captcha import CaptchaSolver, set_solver
+
+class DumbCaptcha(CaptchaSolver):
+    def token(self, rqdata, site_key):
+        r = requests.get(
+            "https://myapi.com",
+            json={"rqdata": rqdata, "siteKey": site_key}
+        )
+        return r.text()
+
+set_solver(DumbCaptcha())
+user = ValLib.User("MyUser", "MyPass")
+auth = ValLib.authenticate(user) # Will use api for captcha solving
+```
+
+**DISCLAMER**: most captcha solving APIs exploit people to solve captchas so I'd recommend agaisnt using them but it's at your own risk.
+
 ## Roadmap
 
 - [ ] Async
