@@ -77,3 +77,9 @@ def get_region(auth: Auth) -> str:
     jsonData = json.loads(data.text)
     region = jsonData["affinities"]["live"]
     return region
+
+
+def get_shard(region: str) -> str:
+    if region in ["latam", "br", "pbe"]:
+        return "na"
+    return region
