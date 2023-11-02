@@ -38,7 +38,7 @@ And the following methods:
 - `cookie_token` to auth with cookies instead of username+password
 - `make_headers` to convert `Auth` into headers for making requests
 
-### Ussage
+### Usage
 
 #### Without API helper
 
