@@ -16,7 +16,7 @@ A Python authentication module for the RiotGames API, and basic endpoint provide
 
 ## Installation
 
-The prefered method of instaltion is through `pip` but if you know better use the package manager that you want.
+The preferred method of installation is through `pip` but if you know better use the package manager that you want.
 
 ```sh
 pip install ValLib
@@ -32,7 +32,7 @@ ValLib contains this basic building blocks:
 - `Auth` a dataclass containing ever auth param
 - `AuthException` a exception class for **only** when the auth goes wrong because of Riot
 
-And the following methdos:
+And the following methods:
 
 - `authenticate` to auth with username+password
 - `cookie_token` to auth with cookies instead of username+password
@@ -116,7 +116,7 @@ user = ValLib.User("MyUser", "MyPass")
 auth = ValLib.authenticate(user) # Will use api for captcha solving
 ```
 
-**DISCLAMER**: most captcha solving APIs exploit people to solve captchas so I'd recommend agaisnt using them but it's at your own risk.
+**DISCLAIMER**: most captcha solving APIs exploit people to solve captchas so I'd recommend against using them but it's at your own risk.
 
 ## Roadmap
 
@@ -127,7 +127,7 @@ auth = ValLib.authenticate(user) # Will use api for captcha solving
 
 ## Running Tests
 
-Tests need to be run in a development enviroment with GUI, a navigator, `pytest` and filling this enviroment variables.
+Tests need to be run in a development environment with GUI, a navigator, `pytest` and filling this environment variables.
 
 ```sh
 USERNAME="TestUser"
