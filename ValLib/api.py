@@ -83,3 +83,8 @@ def get_shard(region: str) -> str:
     if region in ["latam", "br", "pbe"]:
         return "na"
     return region
+
+def get_extra_auth(auth: Auth, username: str) -> ExtraAuth:
+    region = get_region(auth)
+    shard = get_shard(region)
+    return ExtraAuth(username, region, shard, auth)

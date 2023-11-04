@@ -43,6 +43,7 @@ class Auth(Token):
 class ExtraAuth(Auth):
     username: str
     region: str
+    shard: str
     auth: Auth = field(repr=False)
     token: Token = field(init=False)
     user_id: str = field(init=False)
