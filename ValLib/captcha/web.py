@@ -39,9 +39,8 @@ class WebServerSolver(CaptchaSolver):
 
     def _wait(self):
         if self._timeout <= 0:
-            return
+            return Timer(0, lambda: ...)
 
-        #! Careful race condition, easy solve with t.cancel()
         t = Timer(interval=self._timeout,
                   function=self._server.shutdown)
         t.setDaemon(True)
@@ -54,8 +53,9 @@ class WebServerSolver(CaptchaSolver):
         CaptchaHandler.site_key = site_key
         CaptchaHandler.parent = self
         open_url(f"http://{self._address}:{self._port}")
-        self._wait()
+        timer = self._wait()
         self._server.serve_forever()
+        timer.cancel()
         if not hasattr(self, "result"):
             raise HCaptchaTimeoutException()
         return self._finish()
