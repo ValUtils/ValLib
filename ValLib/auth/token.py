@@ -1,6 +1,6 @@
 import time
 
-from httpx import Client
+from httpx import Client, Response
 
 from ..debug import Level, log
 from ..structs import Token
@@ -10,6 +10,11 @@ from .validation import validate_auth
 
 def get_auth_data(session: Client):
     r = setup_auth(session)
+    token, cookies = extract_auth(r)
+    return token, cookies
+
+
+def extract_auth(r: Response):
     cookies = dict(r.cookies)
     data = r.json()
     validate_auth(data)
