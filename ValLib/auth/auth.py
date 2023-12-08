@@ -16,7 +16,7 @@ def authenticate(user: User, remember=False) -> Auth:
 
     setup_auth(session)
 
-    captcha_flow(session, user)
+    captcha_flow(session, user, remember)
 
     token, cookies = get_auth_data(session)
 

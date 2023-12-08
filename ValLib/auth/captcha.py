@@ -15,12 +15,12 @@ def solve_captcha(data: Dict[str, Any]):
     return solver.token(token, key)
 
 
-def get_captcha_token(session: Client):
+def get_captcha_token(session: Client, remember: bool):
     data = {
         "clientId": "riot-client",
         "language": "",
         "platform": "windows",
-        "remember": False,
+        "remember": remember,
         "riot_identity": {
             "language": "en_GB",
             "state": "auth",
@@ -35,13 +35,13 @@ def get_captcha_token(session: Client):
     return response_data
 
 
-def get_login_token(session: Client, user: User, code: str):
+def get_login_token(session: Client, user: User, code: str, remember: bool):
     data = {
         "riot_identity": {
             "captcha": f"hcaptcha {code}",
             "language": "en_GB",
             "password": user.password,
-            "remember": False,
+            "remember": remember,
             "username": user.username
         },
         "type": "auth"
@@ -55,12 +55,12 @@ def get_login_token(session: Client, user: User, code: str):
     return response_data["success"]["login_token"]
 
 
-def login_cookies(session: Client, login_token: str):
+def login_cookies(session: Client, login_token: str, remember: bool):
     data = {
         "authentication_type": "RiotAuth",
         "code_verifier": "",
         "login_token": login_token,
-        "persist_login": False
+        "persist_login": remember
     }
 
     url = "https://auth.riotgames.com/api/v1/login-token"
@@ -68,11 +68,11 @@ def login_cookies(session: Client, login_token: str):
     session.post(url, json=data)
 
 
-def captcha_flow(session: Client, user: User):
-    captcha_data = get_captcha_token(session)
+def captcha_flow(session: Client, user: User, remember: bool):
+    captcha_data = get_captcha_token(session, remember)
 
     captcha_token = solve_captcha(captcha_data)
 
-    login_token = get_login_token(session, user, captcha_token)
+    login_token = get_login_token(session, user, captcha_token, remember)
 
-    login_cookies(session, login_token)
+    login_cookies(session, login_token, remember)
