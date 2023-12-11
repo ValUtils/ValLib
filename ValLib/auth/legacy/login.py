@@ -4,8 +4,8 @@ from ...debug import Level, log
 from ...structs import Auth, User
 from ..info import get_entitlement, get_user_info
 from ..setup import setup_auth
-from ..token import extract_auth
 from .context import riot_ssl_ctx
+from .mfa import extract_auth
 
 
 def legacy_auth(user: User, remember=False) -> Auth:
@@ -40,7 +40,7 @@ def get_auth_data(session: Client, user: User, remember: bool):
     }
     url = "https://auth.riotgames.com/api/v1/authorization"
     r = session.put(url, json=body)
-    token, cookies = extract_auth(r)
+    token, cookies = extract_auth(session, remember, r)
     return token, cookies
 
 

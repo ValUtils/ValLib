@@ -21,3 +21,16 @@ def validate_auth(data: Dict[str, Any]):
         raise AuthException(AUTH.format(err))
     if err == "rate_limited":
         raise RatelimitException()
+
+
+def validate_login_token(data: Dict[str, Any]):
+    res_type = data.get("type")
+    if res_type in ["success", "multifactor"]:
+        return
+    if res_type is None:
+        RiotException(CATASTROPHIC.format(data))
+    err = data.get("error")
+    if res_type == "error":
+        raise RiotException(UNKOWN.format(err))
+    if err == "rate_limited":
+        raise RatelimitException()

@@ -4,9 +4,10 @@ from httpx import Client
 
 from ..captcha import solver
 from ..debug import Level, log
-from ..exceptions import AuthException
 from ..structs import User
 from ..version import Version
+from .mfa import mfa_auth
+from .validation import validate_login_token
 
 
 def solve_captcha(data: Dict[str, Any]):
@@ -50,8 +51,9 @@ def get_login_token(session: Client, user: User, code: str, remember: bool):
     log(Level.DEBUG, f"PUT {url}", "network")
     r = session.put(url, json=data)
     response_data = r.json()
-    if response_data["type"] != "success":
-        raise AuthException("Wrong password or 2fa")
+    validate_login_token(response_data)
+    if response_data["type"] == "multifactor":
+        return mfa_auth(session, remember)
     return response_data["success"]["login_token"]
 
 
