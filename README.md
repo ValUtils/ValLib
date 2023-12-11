@@ -118,6 +118,23 @@ auth = ValLib.authenticate(user) # Will use api for captcha solving
 
 **DISCLAIMER**: most captcha solving APIs exploit people to solve captchas so I'd recommend against using them but it's at your own risk.
 
+### Custom MFA Code
+
+When login into a MFA guarded account, the library will use a standard `input` for getting the MFA code, but you can use your own, here is an example:
+
+```python
+import ValLib
+from ValLib.mfa import MfaInput, set_mfa
+
+class MyMfa(MfaInput):
+    def mfa(self) -> str:
+        return magical_gui_input()
+
+set_mfa(MyMfa())
+user = ValLib.User("MyUser", "MyPass")
+auth = ValLib.authenticate(user) # Will use your func for MFA input
+```
+
 ## Roadmap
 
 - [ ] Async
