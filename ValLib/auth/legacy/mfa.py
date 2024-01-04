@@ -2,7 +2,6 @@ from httpx import Client, Response
 
 from ...mfa import mfa_input
 from ..token import extract_auth as extract
-from ..validation import validate_login_token
 
 
 def mfa_auth(session: Client, remember: bool):
