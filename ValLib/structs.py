@@ -24,7 +24,7 @@ class Token(Base):
     access_token: str
     id_token: str
     expire: float
-    created = time()
+    created: float
 
 
 @dataclass
@@ -37,6 +37,7 @@ class Auth(Token):
     access_token: str = field(init=False)
     id_token: str = field(init=False)
     expire: float = field(init=False)
+    created: float = field(init=False)
 
 
 @dataclass

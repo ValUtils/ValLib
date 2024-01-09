@@ -29,5 +29,5 @@ def get_token(uri: str) -> Token:
     token_id = uri.split("id_token=")[1].split("&")[0]
     expires_in = uri.split("expires_in=")[1].split("&")[0]
     timestamp = time.time() + float(expires_in)
-    token = Token(access_token, token_id, timestamp)
+    token = Token(access_token, token_id, timestamp, time.time())
     return token
