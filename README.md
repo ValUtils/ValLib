@@ -57,11 +57,10 @@ print(data.json())
 
 ```python
 import ValLib
-from ValLib.api import get_api, put_api, post_api
 
 user = ValLib.User("Test", "TestPassword")
 auth = ValLib.authenticate(user)
-data = get_api("https://auth.riotgames.com/userinfo", auth)
+data = ValLib.get("https://auth.riotgames.com/userinfo", auth)
 print(data.json())
 ```
 
