@@ -48,7 +48,7 @@ def setup_session() -> Client:
     log(Level.FULL, "Setting up legacy session")
     session = Client(verify=riot_ssl_ctx())
     session.headers.update({
-        "User-Agent": "ShooterGame/11 Windows/10.0.22621.1.768.64bit",
+        "User-Agent": "FloxayWasRightAndIHateIt",
         "Cache-Control": "no-cache",
         "Accept": "application/json",
         "Content-Type": "application/json"
