@@ -3,12 +3,13 @@ from secrets import token_urlsafe
 from httpx import Client
 
 from ..debug import Level, log
+from .context import riot_ssl_ctx
 from .helper import get_user_agent
 
 
 def setup_session() -> Client:
     log(Level.FULL, "Setting up session")
-    session = Client()
+    session = Client(verify=riot_ssl_ctx())
     session.headers.update({
         "User-Agent": get_user_agent(),
         "Cache-Control": "no-cache",

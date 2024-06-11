@@ -2,9 +2,9 @@ from httpx import Client
 
 from ...debug import Level, log
 from ...structs import Auth, User
+from ..context import riot_ssl_ctx
 from ..info import get_entitlement, get_user_info
 from ..setup import setup_auth
-from .context import riot_ssl_ctx
 from .mfa import extract_auth
 
 
