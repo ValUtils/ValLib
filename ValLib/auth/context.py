@@ -74,7 +74,7 @@ def riot_ssl_ctx() -> ssl.SSLContext:
 
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", category=DeprecationWarning)
-        ctx.minimum_version = ssl.TLSVersion.TLSv1  # deprecated since 3.10
+        ctx.minimum_version = ssl.TLSVersion.TLSv1_3  # deprecated since 3.10
 
     libssl = get_libssl()
     ctx.set_alpn_protocols(["http/1.1"])
