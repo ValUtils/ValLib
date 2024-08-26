@@ -1,6 +1,6 @@
 [project]
 name = "ValLib"
-version = "1.4.0"
+version = "1.5.0"
 readme = "README.md"
 authors = [{ name = "PWall" }]
 license = {text = "GPL-3.0"}
@@ -16,7 +16,7 @@ requires-python = ">=3.8"
 Homepage = "https://github.com/ValUtils/ValLib"
 
 [tool.bumpver]
-current_version = "1.4.0"
+current_version = "1.5.0"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "chore: version bump"
 commit = true
