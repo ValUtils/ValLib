@@ -39,7 +39,9 @@ def get_auth_data(session: Client, user: User, remember: bool):
         "username": user.username
     }
     url = "https://auth.riotgames.com/api/v1/authorization"
-    r = session.put(url, json=body)
+    # credit for the discovery of the necessity of the Referer header goes to @pradishb
+    # original commit in league-client repo: https://github.com/sandbox-pokhara/league-client/commit/34d4c4a48b5925c5c6315e955d37654ad8511210
+    r = session.put(url, json=body, headers={"referer": "https://authenticate.riotgames.com/"})
     token, cookies = extract_auth(session, remember, r)
     return token, cookies
 
