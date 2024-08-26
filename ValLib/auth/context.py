@@ -79,9 +79,11 @@ def riot_ssl_ctx() -> ssl.SSLContext:
     libssl = get_libssl()
     ctx.set_alpn_protocols(["http/1.1"])
     ctx.options |= 1 << 19  # SSL_OP_NO_ENCRYPT_THEN_MAC
+    ctx.options |= 1 << 14  # SSL_OP_NO_TICKET
     libssl.SSL_CTX_set_ciphersuites(ctx_ptr, CIPHERS13.encode())
     libssl.SSL_CTX_set_cipher_list(ctx_ptr, CIPHERS.encode())
     libssl.SSL_CTX_ctrl(ctx_ptr, 98, 0, SIGALGS.encode())
+    libssl.SSL_CTX_ctrl(ctx_ptr, 92, 0, ":".join(("x25519","secp256r1","secp384r1",)).encode())
 
     return ctx
 
